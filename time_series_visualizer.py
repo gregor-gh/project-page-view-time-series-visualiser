@@ -9,7 +9,6 @@ df = pd.read_csv("fcc-forum-pageviews.csv", parse_dates=[0], index_col=0)
 # Clean data
 df = df.loc[(df['value'] >= df['value'].quantile(0.025)) &
             (df['value'] <= df['value'].quantile(0.975))]
-#df = df.loc[df['value'] <= df['value'].quantile(0.975)]
 
 
 def draw_line_plot():
@@ -27,13 +26,21 @@ def draw_line_plot():
 
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
-    df_bar = None
+    df_bar = df.copy()
+    df_bar.reset_index(inplace=True)
+    df_bar['year'] = [d.year for d in df_bar.date]
+    df_bar['month'] = [d.strftime('%B') for d in df_bar.date]
 
     # Draw bar plot
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax = sns.barplot(x="year", y="value", hue="month", data=df_bar, ci=None, hue_order=[
+                     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
+    ax.set_xlabel("Years")
+    ax.set_ylabel("Average Page Views")
 
     # Save image and return fig (don't change this part)
-    # fig.savefig('bar_plot.png')
-    # return fig
+    fig.savefig('bar_plot.png')
+    return fig
 
 
 def draw_box_plot():
@@ -44,10 +51,12 @@ def draw_box_plot():
     df_box['month'] = [d.strftime('%b') for d in df_box.date]
 
     # Draw box plots (using Seaborn)
+    #fig, ax = plt.subplots(figsize=(12, 8))
+    #ax = sns.boxplot(data=df_box, x="year", y="value")
 
     # Save image and return fig (don't change this part)
     # fig.savefig('box_plot.png')
     # return fig
 
 
-draw_line_plot()
+#draw_box_plot()
